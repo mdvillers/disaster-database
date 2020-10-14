@@ -4,7 +4,7 @@ let mysqlConfig = {
   host,
   user,
   password,
-  database: "disaster_test", //COMMENT THIS AND CREATE DATABASE FOR USING FIRST TIME
+  database: "disaster", //COMMENT THIS AND CREATE DATABASE FOR USING FIRST TIME
 };
 
 const db = mysql.createConnection(mysqlConfig);

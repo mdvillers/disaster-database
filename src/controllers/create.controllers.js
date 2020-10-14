@@ -1,25 +1,43 @@
 const { db } = require("../connectdb");
 const CustomError = require("../error/CustomError");
+const fs = require("fs");
+const path = require("path");
+
+const createQueries = fs
+  .readFileSync(path.join(__dirname, "../disaster.sql"))
+  .toString()
+  .replace(/(\r\n|\n|\r)/gm, " ") // remove newlines
+  .replace(/\s+/g, " ") // excess white space
+  .split(";") // split into all statements
+  .map(Function.prototype.call, String.prototype.trim)
+  .filter(function (el) {
+    return el.length != 0;
+  }); // remove any empty ones
 
 exports.createDatabase = (req, res, next) => {
-  let sql = "CREATE DATABASE disaster_test";
-  db.query(sql, (err, result) => {
-    if (err) return next(new CustomError(err.message, 400));
+  db.query(`CREATE DATABASE IF NOT EXISTS disaster`, (err, result) => {
+    if (err) {
+      return next(CustomError(err.message, 500));
+    }
     console.log(result);
-    res.send({ message: "database created successfully" });
   });
+  res.json({ message: "created disaster database successfully" });
 };
 
-exports.createTable = (req, res, next) => {
-  let sql = `CREATE TABLE incidents(
-    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      disasterTypeName VARCHAR(255) NOT NULL,
-      disasterDate DATETIME NOT NULL,
-      district VARCHAR(30) NOT NULL
-    )`;
-  db.query(sql, (err, result) => {
+exports.createTables = (req, res, next) => {
+  db.beginTransaction((err) => {
     if (err) return next(new CustomError(err.message, 400));
-    console.log(result);
-    res.send({ message: "table created successfully" });
+
+    createQueries.forEach((createQuery) => {
+      db.query(createQuery, (err, result) => {
+        if (err) {
+          return db.rollback(() => {
+            console.log(err);
+          });
+        }
+        console.log(result);
+      });
+    });
+    res.send({ message: "tables created successfully" });
   });
 };
