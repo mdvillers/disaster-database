@@ -8,7 +8,7 @@ const disasterGroupRoutes = require("./routes/disasterGroup.routes");
 const disasterSubGroupRoutes = require("./routes/disasterSubGroup.routes");
 const DataSourceRoutes = require("./routes/datasource.routes");
 const districtRoutes = require("./routes/district.routes");
-const VDCorMRoutes = require("./routes/VDCorM.routes");
+const vmRoutes = require("./routes/vm.routes");
 
 const app = express();
 app.use(express.json()); //bodyparser
@@ -29,7 +29,7 @@ app.use("/DataSource", DataSourceRoutes);
 //district table
 app.use("/district", districtRoutes);
 //VDC_or_Municipality table
-app.use("/VDCorM", VDCorMRoutes);
+app.use("/vm", vmRoutes);
 
 app.use("/", (req, res) => {
   res.send({ message: "welcome to disaster database by Absurd Guys" });

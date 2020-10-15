@@ -10,7 +10,7 @@
 2. Comment database for first use
 3. Fill your credentials for mysql
 4. Create database sending GET request to `localhost:5000/create/database`
-5. Create table sending GET request to `localhost:5000/create/table`
+5. Create table sending GET request to `localhost:5000/create/tables`
 
 ### Tables in database
 
@@ -22,7 +22,7 @@
 | DisasterSubGroup    | /disastersubgroup |
 | DataSource          | /datasource       |
 | District            | /district         |
-| VDC_or_Municipality | /vdcorm           |
+| VDC_or_Municipality | /vm               |
 
 #### Attach these with
 

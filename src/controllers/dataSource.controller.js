@@ -13,7 +13,7 @@ exports.getAllDataSources = (req, res, next) => {
 exports.insertDataSource = (req, res, next) => {
   const dataSource = req.body;
   let sql = `INSERT INTO DataSource SET ?`;
-  db.query(sql, incident, (err, result) => {
+  db.query(sql, dataSource, (err, result) => {
     if (err) return next(new CustomError("Cannot insert into table", 400));
     console.log(result);
     res.json(result);

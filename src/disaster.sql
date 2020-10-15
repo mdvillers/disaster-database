@@ -1,19 +1,19 @@
 CREATE TABLE IF NOT EXISTS `District` (
-  `District_Name` VARCHAR(45) NOT NULL,
-  `Province_Number` INT NOT NULL,
-  PRIMARY KEY (`District_Name`));
+  `districtName` VARCHAR(45) NOT NULL,
+  `provinceNumber` INT NOT NULL,
+  PRIMARY KEY (`districtName`));
 
 CREATE TABLE IF NOT EXISTS `VDC_or_Municipality` (
-  `ID` INT NOT NULL AUTO_INCREMENT,
-  `Name` VARCHAR(40) NOT NULL,
-  `Latitude` FLOAT NOT NULL,
-  `Longitude` FLOAT NOT NULL,
-  `District_Name` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`ID`),
-  INDEX `District_Name_idx` (`District_Name` ASC) VISIBLE,
-  CONSTRAINT `District_Name`
-    FOREIGN KEY (`District_Name`)
-    REFERENCES `District` (`District_Name`)
+  `vmId` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(40) NOT NULL,
+  `latitude` FLOAT NOT NULL,
+  `longitude` FLOAT NOT NULL,
+  `districtName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`vmId`),
+  INDEX `districtName_idx` (`districtName` ASC) VISIBLE,
+  CONSTRAINT `districtName`
+    FOREIGN KEY (`districtName`)
+    REFERENCES `District` (`districtName`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
@@ -29,68 +29,70 @@ CREATE TABLE IF NOT EXISTS `DisasterGroup` (
   PRIMARY KEY (`disasterGroupName`));
 
 CREATE TABLE IF NOT EXISTS `DisasterSubGroup` (
-  `DisasterSubGroupName` VARCHAR(45) NOT NULL,
+  `disasterSubGroupName` VARCHAR(45) NOT NULL,
   `description` LONGTEXT NULL DEFAULT NULL,
-  `DisasterSubGroupcol` VARCHAR(45) NULL DEFAULT NULL,
-  PRIMARY KEY (`DisasterSubGroupName`),
+  `disasterGroupName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`disasterSubGroupName`),
   CONSTRAINT `disasterGroupName`
-    FOREIGN KEY (`DisasterSubGroupName`)
+    FOREIGN KEY (`disasterGroupName`)
     REFERENCES `DisasterGroup` (`disasterGroupName`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
 CREATE TABLE IF NOT EXISTS `DisasterType` (
+ `disasterTypeId` INT NOT NULL AUTO_INCREMENT,
   `disasterTypeName` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`disasterTypeName`),
-  CONSTRAINT `disasterSubgroupName`
-    FOREIGN KEY (`disasterTypeName`)
-    REFERENCES `DisasterSubGroup` (`DisasterSubGroupName`)
+  `disasterSubGroupName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`disasterTypeId`),
+  CONSTRAINT `disasterSubGroupName`
+    FOREIGN KEY (`disasterSubGroupName`)
+    REFERENCES `DisasterSubGroup` (`disasterSubGroupName`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
 CREATE TABLE IF NOT EXISTS `Incident` (
   `incidentID` INT NOT NULL AUTO_INCREMENT,
   `locationId` INT NULL DEFAULT NULL,
-  `disasterTypeName` VARCHAR(45) NULL DEFAULT NULL,
+  `disasterTypeId` INT NULL DEFAULT NULL,
   `sourceId` INT NULL DEFAULT NULL,
-  `IncidentDate` DATETIME NOT NULL,
-  `DeathMale` INT NULL DEFAULT NULL,
-  `DeathFemale` INT NULL DEFAULT NULL,
-  `Total Death` INT NULL DEFAULT NULL,
-  `Missing People` INT NULL DEFAULT NULL,
-  `Affected Family` INT NULL DEFAULT NULL,
-  `Estimated Loss` INT NULL DEFAULT NULL,
-  `Injured` INT NULL DEFAULT NULL,
-  `Govt. Houses Fully Damaged` INT NULL DEFAULT NULL,
-  `Govt. Houses Partially Damaged` INT NULL DEFAULT NULL,
-  `Private House Fully Damaged` INT NULL DEFAULT NULL,
-  `Private House Partially Damaged` INT NULL DEFAULT NULL,
-  `Displaced Male` INT NULL DEFAULT NULL,
-  `Displaced Female` INT NULL DEFAULT NULL,
-  `Property Loss` INT NULL DEFAULT NULL,
-  `Damaged Houses(%)` FLOAT NULL DEFAULT NULL,
-  `Cattles Loss` INT NULL DEFAULT NULL,
-  `No. of Displaced Family` INT NULL DEFAULT NULL,
-  `Displaced Shed` INT NULL DEFAULT NULL,
-  `Office` VARCHAR(45) NULL DEFAULT 'Nepal Police',
-  `Remarks` LONGTEXT NULL DEFAULT NULL,
-  `Incidentcol` VARCHAR(45) NULL DEFAULT NULL,
+  `incidentDate` DATETIME NOT NULL,
+  `deathMale` INT NULL DEFAULT NULL,
+  `deathFemale` INT NULL DEFAULT NULL,
+  `totalDeath` INT NULL DEFAULT NULL,
+  `missingPeople` INT NULL DEFAULT NULL,
+  `affectedFamily` INT NULL DEFAULT NULL,
+  `estimatedLoss` INT NULL DEFAULT NULL,
+  `injured` INT NULL DEFAULT NULL,
+  `govtHousesFullyDamaged` INT NULL DEFAULT NULL,
+  `govtHousesPartiallyDamaged` INT NULL DEFAULT NULL,
+  `privateHouseFullyDamaged` INT NULL DEFAULT NULL,
+  `privateHousePartiallyDamaged` INT NULL DEFAULT NULL,
+  `displacedMale` INT NULL DEFAULT NULL,
+  `displacedFemale` INT NULL DEFAULT NULL,
+  `propertyLoss` INT NULL DEFAULT NULL,
+  `damagedHousesPercentage` FLOAT NULL DEFAULT NULL,
+  `cattlesLoss` INT NULL DEFAULT NULL,
+  `numOfDisplacedFamily` INT NULL DEFAULT NULL,
+  `displacedShed` INT NULL DEFAULT NULL,
+  `office` VARCHAR(45) NULL DEFAULT 'Nepal Police',
+  `remarks` LONGTEXT NULL DEFAULT NULL,
   PRIMARY KEY (`incidentID`),
   INDEX `locationId_idx` (`locationId` ASC) VISIBLE,
-  INDEX `disasterTypeName_idx` (`disasterTypeName` ASC) VISIBLE,
+  INDEX `disasterTypeId_idx` (`disasterTypeId` ASC) VISIBLE,
   INDEX `sourceId_idx` (`sourceId` ASC) VISIBLE,
   CONSTRAINT `locationId`
     FOREIGN KEY (`locationId`)
-    REFERENCES `VDC_or_Municipality` (`ID`)
+    REFERENCES `VDC_or_Municipality` (`vmId`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `disasterTypeName`
-    FOREIGN KEY (`disasterTypeName`)
-    REFERENCES `DisasterType` (`disasterTypeName`)
+  CONSTRAINT `disasterTypeId`
+    FOREIGN KEY (`disasterTypeId`)
+    REFERENCES `DisasterType` (`disasterTypeId`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `sourceId`
     FOREIGN KEY (`sourceId`)
     REFERENCES `DataSource` (`sourceId`)
     ON DELETE CASCADE
-    ON UPDATE CASCADE)
+    ON UPDATE CASCADE
+)
