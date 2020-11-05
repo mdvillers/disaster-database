@@ -13,7 +13,7 @@ exports.getAllDataSources = (req, res, next) => {
 exports.insertDataSource = (req, res, next) => {
   const dataSource = req.body;
   let sql = `INSERT INTO DataSource SET ?`;
-  db.query(sql, incident, (err, result) => {
+  db.query(sql, dataSource, (err, result) => {
     if (err) return next(new CustomError("Cannot insert into table", 400));
     console.log(result);
     res.json(result);
@@ -22,7 +22,7 @@ exports.insertDataSource = (req, res, next) => {
 
 exports.deleteDataSourceBySourceId = (req, res, next) => {
   const { sourceId } = req.params;
-  let sql = `DELETE FROM DataSource where sourceId = ?`;
+  let sql = `DELETE FROM DataSource where sourceID = ?`;
   db.query(sql, sourceId, (err, result) => {
     if (err) return next(new CustomError("Cannot delete DataSource", 400));
     console.log(result);

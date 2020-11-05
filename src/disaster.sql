@@ -1,96 +1,97 @@
-CREATE TABLE IF NOT EXISTS `District` (
-  `District_Name` VARCHAR(45) NOT NULL,
-  `Province_Number` INT NOT NULL,
-  PRIMARY KEY (`District_Name`));
-
-CREATE TABLE IF NOT EXISTS `VDC_or_Municipality` (
-  `ID` INT NOT NULL AUTO_INCREMENT,
-  `Name` VARCHAR(40) NOT NULL,
-  `Latitude` FLOAT NOT NULL,
-  `Longitude` FLOAT NOT NULL,
-  `District_Name` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`ID`),
-  INDEX `District_Name_idx` (`District_Name` ASC) VISIBLE,
-  CONSTRAINT `District_Name`
-    FOREIGN KEY (`District_Name`)
-    REFERENCES `District` (`District_Name`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE);
-
 CREATE TABLE IF NOT EXISTS `DataSource` (
-  `sourceId` INT NOT NULL AUTO_INCREMENT,
+  `sourceID` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NULL DEFAULT NULL,
   `website` VARCHAR(45) NULL DEFAULT NULL,
-  PRIMARY KEY (`sourceId`));
+  PRIMARY KEY (`sourceID`));
 
-CREATE TABLE IF NOT EXISTS `DisasterGroup` (
-  `disasterGroupName` VARCHAR(45) NOT NULL,
-  `description` VARCHAR(1000) NULL DEFAULT NULL,
-  PRIMARY KEY (`disasterGroupName`));
-
-CREATE TABLE IF NOT EXISTS `DisasterSubGroup` (
-  `DisasterSubGroupName` VARCHAR(45) NOT NULL,
-  `description` LONGTEXT NULL DEFAULT NULL,
-  `DisasterSubGroupcol` VARCHAR(45) NULL DEFAULT NULL,
-  PRIMARY KEY (`DisasterSubGroupName`),
-  CONSTRAINT `disasterGroupName`
-    FOREIGN KEY (`DisasterSubGroupName`)
-    REFERENCES `DisasterGroup` (`disasterGroupName`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE);
 
 CREATE TABLE IF NOT EXISTS `DisasterType` (
   `disasterTypeName` VARCHAR(45) NOT NULL,
+  `description` LONGTEXT NULL DEFAULT NULL,
   PRIMARY KEY (`disasterTypeName`),
-  CONSTRAINT `disasterSubgroupName`
-    FOREIGN KEY (`disasterTypeName`)
-    REFERENCES `DisasterSubGroup` (`DisasterSubGroupName`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE);
+  UNIQUE INDEX `disasterTypeName_UNIQUE` (`disasterTypeName` ASC) VISIBLE);
+
+
+CREATE TABLE IF NOT EXISTS `District` (
+  `provinceNumber` INT NOT NULL,
+  `districtName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`districtName`));
+
+
+CREATE TABLE IF NOT EXISTS `VDC_or_Municipality` (
+  `vmID` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(40) NOT NULL,
+  `latitude` FLOAT NOT NULL,
+  `longitude` FLOAT NOT NULL,
+  `districtName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`vmID`),
+  INDEX `districtName_idx` (`districtName` ASC) VISIBLE,
+  CONSTRAINT `districtName`
+    FOREIGN KEY (`districtName`)
+    REFERENCES `District` (`districtName`));
+
 
 CREATE TABLE IF NOT EXISTS `Incident` (
   `incidentID` INT NOT NULL AUTO_INCREMENT,
-  `locationId` INT NULL DEFAULT NULL,
+  `incidentDate` DATETIME NOT NULL,
+  `totalDeath` INT NULL DEFAULT NULL,
+  `missingPeople` INT NULL DEFAULT NULL,
+  `affectedFamily` INT NULL DEFAULT NULL,
+  `estimatedLoss` INT NULL DEFAULT NULL,
+  `injured` INT NULL DEFAULT NULL,
+  `propertyLoss` INT NULL DEFAULT NULL,
+  `damagedHouses` FLOAT NULL DEFAULT NULL,
   `disasterTypeName` VARCHAR(45) NULL DEFAULT NULL,
-  `sourceId` INT NULL DEFAULT NULL,
-  `IncidentDate` DATETIME NOT NULL,
-  `DeathMale` INT NULL DEFAULT NULL,
-  `DeathFemale` INT NULL DEFAULT NULL,
-  `Total Death` INT NULL DEFAULT NULL,
-  `Missing People` INT NULL DEFAULT NULL,
-  `Affected Family` INT NULL DEFAULT NULL,
-  `Estimated Loss` INT NULL DEFAULT NULL,
-  `Injured` INT NULL DEFAULT NULL,
-  `Govt. Houses Fully Damaged` INT NULL DEFAULT NULL,
-  `Govt. Houses Partially Damaged` INT NULL DEFAULT NULL,
-  `Private House Fully Damaged` INT NULL DEFAULT NULL,
-  `Private House Partially Damaged` INT NULL DEFAULT NULL,
-  `Displaced Male` INT NULL DEFAULT NULL,
-  `Displaced Female` INT NULL DEFAULT NULL,
-  `Property Loss` INT NULL DEFAULT NULL,
-  `Damaged Houses(%)` FLOAT NULL DEFAULT NULL,
-  `Cattles Loss` INT NULL DEFAULT NULL,
-  `No. of Displaced Family` INT NULL DEFAULT NULL,
-  `Displaced Shed` INT NULL DEFAULT NULL,
-  `Office` VARCHAR(45) NULL DEFAULT 'Nepal Police',
-  `Remarks` LONGTEXT NULL DEFAULT NULL,
-  `Incidentcol` VARCHAR(45) NULL DEFAULT NULL,
+  `locationID` INT NULL DEFAULT NULL,
+  `sourceID` INT NULL DEFAULT NULL,
   PRIMARY KEY (`incidentID`),
-  INDEX `locationId_idx` (`locationId` ASC) VISIBLE,
+  INDEX `locationID_idx` (`locationID` ASC) VISIBLE,
+  INDEX `sourceID_idx` (`sourceID` ASC) VISIBLE,
   INDEX `disasterTypeName_idx` (`disasterTypeName` ASC) VISIBLE,
-  INDEX `sourceId_idx` (`sourceId` ASC) VISIBLE,
-  CONSTRAINT `locationId`
-    FOREIGN KEY (`locationId`)
-    REFERENCES `VDC_or_Municipality` (`ID`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
   CONSTRAINT `disasterTypeName`
     FOREIGN KEY (`disasterTypeName`)
     REFERENCES `DisasterType` (`disasterTypeName`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `sourceId`
-    FOREIGN KEY (`sourceId`)
-    REFERENCES `DataSource` (`sourceId`)
+  CONSTRAINT `locationID`
+    FOREIGN KEY (`locationID`)
+    REFERENCES `VDC_or_Municipality` (`vmID`),
+  CONSTRAINT `sourceID`
+    FOREIGN KEY (`sourceID`)
+    REFERENCES `DataSource` (`sourceID`));
+
+
+CREATE TABLE IF NOT EXISTS `Earthquake` (
+  `earthquakeID` INT NOT NULL,
+  `richterMagnitude` FLOAT UNSIGNED NULL DEFAULT NULL,
+  `epicenter` VARCHAR(45) NULL DEFAULT NULL,
+  UNIQUE INDEX `earthquakeID_UNIQUE` (`earthquakeID` ASC),
+  CONSTRAINT `earthquakeID`
+    FOREIGN KEY (`earthquakeID`)
+    REFERENCES `Incident` (`incidentID`)
     ON DELETE CASCADE
-    ON UPDATE CASCADE)
+    ON UPDATE CASCADE);
+
+
+CREATE TABLE IF NOT EXISTS `Fire` (
+  `fireID` INT NOT NULL,
+  `cause` VARCHAR(45) NULL DEFAULT NULL,
+  UNIQUE INDEX `fireID_UNIQUE` (`fireID` ASC),
+  CONSTRAINT `fireID`
+    FOREIGN KEY (`fireID`)
+    REFERENCES `Incident` (`incidentID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+
+CREATE TABLE IF NOT EXISTS `Flood` (
+  `floodID` INT NOT NULL,
+  `origin` VARCHAR(45) NULL DEFAULT NULL,
+  `height` VARCHAR(45) NULL DEFAULT NULL,
+  `cattleLoss` INT NULL DEFAULT NULL,
+  UNIQUE INDEX `floodID_UNIQUE` (`floodID` ASC),
+  CONSTRAINT `floodID`
+    FOREIGN KEY (`floodID`)
+    REFERENCES `Incident` (`incidentID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);

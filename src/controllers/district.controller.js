@@ -11,9 +11,9 @@ exports.getAllDistricts = (req, res, next) => {
 };
 
 exports.insertDistrict = (req, res, next) => {
-  const incident = req.body;
+  const district = req.body;
   let sql = `INSERT INTO District SET ?`;
-  db.query(sql, incident, (err, result) => {
+  db.query(sql, district, (err, result) => {
     if (err) return next(new CustomError("Cannot insert into table", 400));
     console.log(result);
     res.json(result);
@@ -22,7 +22,7 @@ exports.insertDistrict = (req, res, next) => {
 
 exports.deleteDistrictByName = (req, res, next) => {
   const { name } = req.params;
-  let sql = `DELETE FROM District where District_Name = ?`;
+  let sql = `DELETE FROM District where districtName = ?`;
   db.query(sql, name, (err, result) => {
     if (err) return next(new CustomError("Cannot delete District", 400));
     console.log(result);
