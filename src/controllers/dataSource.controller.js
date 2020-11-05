@@ -22,7 +22,7 @@ exports.insertDataSource = (req, res, next) => {
 
 exports.deleteDataSourceBySourceId = (req, res, next) => {
   const { sourceId } = req.params;
-  let sql = `DELETE FROM DataSource where sourceId = ?`;
+  let sql = `DELETE FROM DataSource where sourceID = ?`;
   db.query(sql, sourceId, (err, result) => {
     if (err) return next(new CustomError("Cannot delete DataSource", 400));
     console.log(result);

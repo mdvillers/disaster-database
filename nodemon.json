@@ -1,8 +1,10 @@
 {
   "env": {
     "PORT": 5000,
-    "host": "localhost",
-    "user": "mdvillers",
-    "password": "password"
+    "RDS_HOSTNAME": "disaster.cftijebrax4l.us-east-1.rds.amazonaws.com",
+    "RDS_USERNAME": "admin",
+    "RDS_PASSWORD": "mdvillers",
+    "RDS_DATABASE": "disaster",
+    "RDS_PORT": 3306
   }
 }
