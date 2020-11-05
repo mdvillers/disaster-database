@@ -26,6 +26,14 @@
 | /view     | GET          |
 | /delete   | DELETE       |
 
+### for incident
+
+| End point        | Request Type |
+| ---------------- | ------------ |
+| /earthquake/view | GET          |
+| /flood/view      | GET          |
+| /fire/view       | GET          |
+
 ##### Examples
 
 ```sql

@@ -73,6 +73,32 @@ exports.insertIncident = (req, res, next) => {
   res.json({ message: "Incident created successfully" });
 };
 
+exports.getAllFireIncidents = (req, res, next) => {
+  let sql = `SELECT * FROM Fire f join Incident i on i.incidentID=f.fireID `;
+  db.query(sql, (err, result) => {
+    if (err) return next(new CustomError("Cannot get Fire Incident", 400));
+    console.log(result);
+    res.json(result);
+  });
+};
+exports.getAllFloodIncidents = (req, res, next) => {
+  let sql = `SELECT * FROM Flood f join Incident i on i.incidentID=f.floodID `;
+  db.query(sql, (err, result) => {
+    if (err) return next(new CustomError("Cannot get Flood Incident", 400));
+    console.log(result);
+    res.json(result);
+  });
+};
+exports.getAllEarthquakeIncidents = (req, res, next) => {
+  let sql = `SELECT * FROM Earthquake e join Incident i on i.incidentID=e.earthquakeID `;
+  db.query(sql, (err, result) => {
+    if (err)
+      return next(new CustomError("Cannot get Earthquake Incident", 400));
+    console.log(result);
+    res.json(result);
+  });
+};
+
 exports.deleteIncidentById = (req, res, next) => {
   const { id } = req.params;
   let sql = `DELETE FROM Incident where incidentID = ?`;
