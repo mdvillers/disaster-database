@@ -15,6 +15,10 @@ let joinsql = `natural join DisasterType
 
 const disasterTypes = ["Flood", "Earthquake", "Fire"];
 
+String.prototype.capitalize = function () {
+  return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
 const getObjectWithKeysInArray = (arr, object) =>
   arr.reduce((obj, key) => {
     if (key in object) {
@@ -24,9 +28,15 @@ const getObjectWithKeysInArray = (arr, object) =>
   }, {});
 
 exports.getAllIncidents = (req, res, next) => {
-  let sql = `SELECT * FROM Incident i ${joinsql}`;
+  let sql;
+  let { type } = req.params;
+  type = type.toLowerCase();
+  if (!disasterTypes.includes(type.capitalize()))
+    sql = `SELECT * FROM Incident i ${joinsql}`;
+  else
+    sql = `SELECT * FROM ${type.capitalize()} x join Incident i on i.incidentID=x.${type}ID ${joinsql}`;
   db.query(sql, (err, result) => {
-    if (err) return next(new CustomError("Cannot get Incident", 400));
+    if (err) return next(new CustomError("Cannot get Incident" + err, 400));
     console.log(result);
     res.json(result);
   });
@@ -68,41 +78,6 @@ exports.insertIncident = (req, res, next) => {
   });
 
   res.json({ message: "Incident created successfully" });
-};
-
-exports.getAllFireIncidents = (req, res, next) => {
-  let sql = `SELECT * FROM Fire f 
-              join Incident i 
-              on i.incidentID = f.fireID 
-              ${joinsql}`;
-  db.query(sql, (err, result) => {
-    if (err) return next(new CustomError("Cannot get Fire Incident", 400));
-    console.log(result);
-    res.json(result);
-  });
-};
-exports.getAllFloodIncidents = (req, res, next) => {
-  let sql = `SELECT * FROM Flood f 
-              join Incident i 
-              on i.incidentID = f.floodID 
-  ${joinsql}`;
-  db.query(sql, (err, result) => {
-    if (err) return next(new CustomError("Cannot get Flood Incident", 400));
-    console.log(result);
-    res.json(result);
-  });
-};
-exports.getAllEarthquakeIncidents = (req, res, next) => {
-  let sql = `SELECT * FROM Earthquake e 
-            join Incident i 
-            on i.incidentID=e.earthquakeID 
-  ${joinsql}`;
-  db.query(sql, (err, result) => {
-    if (err)
-      return next(new CustomError("Cannot get Earthquake Incident", 400));
-    console.log(result);
-    res.json(result);
-  });
 };
 
 exports.updateIncidentById = (req, res, next) => {
