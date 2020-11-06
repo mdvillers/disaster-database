@@ -1,4 +1,4 @@
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const {
   RDS_HOSTNAME: host,
   RDS_USERNAME: user,
@@ -17,10 +17,9 @@ let mysqlConfig = {
 
 const db = mysql.createConnection(mysqlConfig);
 
-//Connect
-db.connect((err) => {
-  if (err) throw err;
-  console.log("Mysql connection started successfully...");
-});
+db.promise()
+  .connect()
+  .then(console.log(`MySQL connection established`))
+  .catch((err) => console.log(err));
 
 exports.db = db;

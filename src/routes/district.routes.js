@@ -9,6 +9,6 @@ const router = express.Router();
 
 router.get("/view", getAllDistricts);
 router.post("/insert", insertDistrict);
-router.delete("/delete/:id", deleteDistrictByName);
+router.delete("/delete/:name", deleteDistrictByName);
 
 module.exports = router;

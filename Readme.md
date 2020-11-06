@@ -15,7 +15,7 @@
 | Incident            | /incident     | /insert (POST), /view (GET), /view/:type (GET), /delete/:id (DELETE), /update/:id (PATCH) |
 | DisasterType        | /disastertype | /insert (POST), /view (GET), /delete/:name (DELETE)                                       |
 | DataSource          | /datasource   | /insert (POST), /view (GET), /delete/:id (DELETE)                                         |
-| District            | /district     | /insert (POST), /view (GET), /delete/:id (DELETE)                                         |
+| District            | /district     | /insert (POST), /view (GET), /delete/:name (DELETE)                                       |
 | VDC_or_Municipality | /vm           | /insert (POST), /view (GET), /delete/:id (DELETE)                                         |
 
 ##### Examples

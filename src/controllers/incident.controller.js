@@ -35,11 +35,14 @@ exports.getAllIncidents = (req, res, next) => {
     sql = `SELECT * FROM Incident i ${joinsql}`;
   else
     sql = `SELECT * FROM ${type.capitalize()} x join Incident i on i.incidentID=x.${type}ID ${joinsql}`;
-  db.query(sql, (err, result) => {
-    if (err) return next(new CustomError("Cannot get Incident" + err, 400));
-    console.log(result);
-    res.json(result);
-  });
+
+  db.promise()
+    .query(sql)
+    .then((result) => {
+      console.log(result[0]);
+      res.json(result[0]);
+    })
+    .catch((err) => next(new CustomError("Cannot get Incident", 400)));
 };
 
 exports.insertIncident = (req, res, next) => {
@@ -56,26 +59,29 @@ exports.insertIncident = (req, res, next) => {
   const { disasterTypeName } = incident;
 
   //insert into incident table first
-  db.query(incidentSql, incident, (err, result) => {
-    let incidentID, otherSql;
-    if (err) console.log(err);
-    incidentID = result.insertId;
-    console.log(result);
+  db.promise()
+    .query(incidentSql, incident)
+    .then((result) => {
+      let incidentID, otherSql;
+      incidentID = result[0].insertId;
 
-    //make suitable sql commands to enter into respective disasterType
-    if (disasterTypes.includes(disasterTypeName)) {
-      otherDetails[`${disasterTypeName.toLowerCase()}ID`] = incidentID;
-      otherSql = `INSERT INTO ${disasterTypeName} SET ?`;
-    } else {
-      return next(new CustomError("Invalid disaster typename", 404));
-    }
+      //make suitable sql commands to enter into respective disasterType
+      if (disasterTypes.includes(disasterTypeName)) {
+        otherDetails[`${disasterTypeName.toLowerCase()}ID`] = incidentID;
+        otherSql = `INSERT INTO ${disasterTypeName} SET ?`;
+      } else {
+        return next(new CustomError("Invalid disaster typename", 404));
+      }
 
-    //Insert into respective disasterType
-    db.query(otherSql, otherDetails, (err, result) => {
-      if (err) console.log(err);
-      console.log(result);
-    });
-  });
+      //Insert into respective disasterType
+      db.promise()
+        .query(otherSql, otherDetails)
+        .then((result) => {
+          console.log(result[0]);
+        })
+        .catch((err) => next(new CustomError("Cannot get Incident", 400)));
+    })
+    .catch((err) => next(new CustomError("Cannot insert incident", 400)));
 
   res.json({ message: "Incident created successfully" });
 };
@@ -92,43 +98,46 @@ exports.updateIncidentById = (req, res, next) => {
     incidentDetails
   );
 
-  
-  db.query(
-    `SELECT disasterTypeName FROM Incident WHERE incidentID = ? `,
-    id,
-    (err, result) => {
-      if (err)
-        return next(
-          new CustomError("Cannot get disaster type name Incident", 400)
-        );
-      disasterTypeName = result[0].disasterTypeName;
-
+  db.promise()
+    .query(`SELECT disasterTypeName FROM Incident WHERE incidentID = ? `, id)
+    .then((result) => {
+      console.log(result[0]);
+      disasterTypeName = result[0][0].disasterTypeName;
       let sql = `UPDATE Incident SET ? WHERE incidentID = ?`;
-      db.query(sql, [incident, id], (err, result) => {
-        if (err) return next(new CustomError("Cannot Update Incident", 400));
 
-        db.query(
-          `UPDATE ${disasterTypeName} SET ? WHERE ${disasterTypeName.toLowerCase()}ID = ?`,
-          [otherDetails, id],
-          (err, result) => {
-            if (err)
-              return next(
-                new CustomError(`Cannot Update ${disasterTypeName}`, 400)
-              );
-            res.json(result);
-          }
-        );
-      });
-    }
-  );
+      db.promise()
+        .query(sql, [incident, id])
+        .then((result) => {
+          console.log(result[0]);
+
+          db.promise()
+            .query(
+              `UPDATE ${disasterTypeName} SET ? WHERE ${disasterTypeName.toLowerCase()}ID = ?`,
+              [otherDetails, id]
+            )
+            .then((result) => {
+              console.log(result[0]);
+              res.json(result[0]);
+            })
+            .catch((err) =>
+              next(new CustomError(`Cannot Update ${disasterTypeName}`, 400))
+            );
+        })
+        .catch((err) => next(new CustomError("Cannot Update Incident", 400)));
+    })
+    .catch((err) =>
+      next(new CustomError("Cannot get disaster type name " + err, 400))
+    );
 };
 
 exports.deleteIncidentById = (req, res, next) => {
   const { id } = req.params;
   let sql = `DELETE FROM Incident where incidentID = ?`;
-  db.query(sql, id, (err, result) => {
-    if (err) return next(new CustomError("Cannot delete Incident", 400));
-    console.log(result);
-    res.json(result);
-  });
+  db.promise()
+    .query(sql, id)
+    .then((result) => {
+      console.log(result[0]);
+      res.json(result[0]);
+    })
+    .catch((err) => next(new CustomError("Cannot delete Incident", 400)));
 };
