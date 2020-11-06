@@ -30,8 +30,8 @@ const getObjectWithKeysInArray = (arr, object) =>
 exports.getAllIncidents = (req, res, next) => {
   let sql;
   let { type } = req.params;
-  type = type.toLowerCase();
-  if (!disasterTypes.includes(type.capitalize()))
+  if (type) type = type.toLowerCase();
+  if (!disasterTypes.includes(type && type.capitalize()))
     sql = `SELECT * FROM Incident i ${joinsql}`;
   else
     sql = `SELECT * FROM ${type.capitalize()} x join Incident i on i.incidentID=x.${type}ID ${joinsql}`;
@@ -82,16 +82,45 @@ exports.insertIncident = (req, res, next) => {
 
 exports.updateIncidentById = (req, res, next) => {
   const {
-    body: incident,
+    body: incidentDetails,
     params: { id },
   } = req;
 
-  let sql = `UPDATE Incident SET ? WHERE incidentID = ?`;
-  db.query(sql, [incident, id], (err, result) => {
-    if (err) return next(new CustomError("Cannot Update Incident", 400));
-    console.log(result);
-    res.json(result);
-  });
+  const incident = getObjectWithKeysInArray(INCIDENT_KEYS, incidentDetails);
+  const otherDetails = getObjectWithKeysInArray(
+    [...FIRE_KEYS, ...EARTHQUAKE_KEYS, ...FLOOD_KEYS],
+    incidentDetails
+  );
+
+  
+  db.query(
+    `SELECT disasterTypeName FROM Incident WHERE incidentID = ? `,
+    id,
+    (err, result) => {
+      if (err)
+        return next(
+          new CustomError("Cannot get disaster type name Incident", 400)
+        );
+      disasterTypeName = result[0].disasterTypeName;
+
+      let sql = `UPDATE Incident SET ? WHERE incidentID = ?`;
+      db.query(sql, [incident, id], (err, result) => {
+        if (err) return next(new CustomError("Cannot Update Incident", 400));
+
+        db.query(
+          `UPDATE ${disasterTypeName} SET ? WHERE ${disasterTypeName.toLowerCase()}ID = ?`,
+          [otherDetails, id],
+          (err, result) => {
+            if (err)
+              return next(
+                new CustomError(`Cannot Update ${disasterTypeName}`, 400)
+              );
+            res.json(result);
+          }
+        );
+      });
+    }
+  );
 };
 
 exports.deleteIncidentById = (req, res, next) => {
