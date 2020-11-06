@@ -10,6 +10,7 @@ const vmRoutes = require("./routes/vm.routes");
 const { allData } = require("./controllers/allData.controller");
 
 const app = express();
+app.use(require("cors")());
 app.use(express.json()); //bodyparser
 
 //create database or tables
