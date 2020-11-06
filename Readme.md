@@ -10,33 +10,17 @@
 
 ### Tables in database
 
-| Table               | End Point     |
-| ------------------- | ------------- |
-| Incident            | /incident     |
-| DisasterType        | /disastertype |
-| DataSource          | /datasource   |
-| District            | /district     |
-| VDC_or_Municipality | /vm           |
-
-#### Attach these with
-
-| End point | Request Type |
-| --------- | ------------ |
-| /insert   | POST         |
-| /view     | GET          |
-| /delete   | DELETE       |
-
-### for incident
-
-| End point        | Request Type |
-| ---------------- | ------------ |
-| /earthquake/view | GET          |
-| /flood/view      | GET          |
-| /fire/view       | GET          |
+| Table               | Main Point    | Attachable                                                                                |
+| ------------------- | ------------- | ----------------------------------------------------------------------------------------- |
+| Incident            | /incident     | /insert (POST), /view (GET), /view/:type (GET), /delete/:id (DELETE), /update/:id (PATCH) |
+| DisasterType        | /disastertype | /insert (POST), /view (GET), /delete/:name (DELETE)                                       |
+| DataSource          | /datasource   | /insert (POST), /view (GET), /delete/:id (DELETE)                                         |
+| District            | /district     | /insert (POST), /view (GET), /delete/:id (DELETE)                                         |
+| VDC_or_Municipality | /vm           | /insert (POST), /view (GET), /delete/:id (DELETE)                                         |
 
 ##### Examples
 
-```sql
+```py
 https://localhost:5000/incident/view for viewing incident table
 https://localhost:5000/incident/insert for inserting into incident table
 ```
