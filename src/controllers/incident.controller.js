@@ -49,10 +49,6 @@ exports.insertIncident = (req, res, next) => {
   const incidentDetails = req.body;
 
   const incident = getObjectWithKeysInArray(INCIDENT_KEYS, incidentDetails);
-  const otherDetails = getObjectWithKeysInArray(
-    [...FIRE_KEYS, ...EARTHQUAKE_KEYS, ...FLOOD_KEYS],
-    incidentDetails
-  );
 
   let incidentSql = `INSERT INTO Incident SET ?`;
 
@@ -64,6 +60,11 @@ exports.insertIncident = (req, res, next) => {
     .then((result) => {
       let incidentID, otherSql;
       incidentID = result[0].insertId;
+
+      const otherDetails = getObjectWithKeysInArray(
+        eval(`${disasterTypeName}_KEYS`.toUpperCase()),
+        incidentDetails
+      );
 
       //make suitable sql commands to enter into respective disasterType
       if (disasterTypes.includes(disasterTypeName)) {
@@ -93,16 +94,17 @@ exports.updateIncidentById = (req, res, next) => {
   } = req;
 
   const incident = getObjectWithKeysInArray(INCIDENT_KEYS, incidentDetails);
-  const otherDetails = getObjectWithKeysInArray(
-    [...FIRE_KEYS, ...EARTHQUAKE_KEYS, ...FLOOD_KEYS],
-    incidentDetails
-  );
 
   db.promise()
     .query(`SELECT disasterTypeName FROM Incident WHERE incidentID = ? `, id)
     .then((result) => {
       console.log(result[0]);
       disasterTypeName = result[0][0].disasterTypeName;
+
+      const otherDetails = getObjectWithKeysInArray(
+        eval(`${disasterTypeName}_KEYS`.toUpperCase()),
+        incidentDetails
+      );
 
       let sql =
         Object.keys(incident).length > 0
