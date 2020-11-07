@@ -12,6 +12,18 @@ exports.getAllvms = (req, res, next) => {
     .catch((err) => next(new CustomError("Cannot get vm", 400)));
 };
 
+exports.getVmsByDistrictName = (req, res, next) => {
+  const {name} = req.params;
+  let sql = `SELECT * FROM VDC_or_Municipality where districtName = ?`;
+  db.promise()
+    .query(sql,name)
+    .then((result) => {
+      console.log(result[0]);
+      res.json(result[0]);
+    })
+    .catch((err) => next(new CustomError("Cannot get vm", 400)));
+};
+
 exports.insertvm = (req, res, next) => {
   const vm = req.body;
   let sql = `INSERT INTO VDC_or_Municipality SET ?`;

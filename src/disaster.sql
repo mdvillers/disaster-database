@@ -15,14 +15,14 @@ CREATE TABLE IF NOT EXISTS `DisasterType` (
 CREATE TABLE IF NOT EXISTS `District` (
   `provinceNumber` INT NOT NULL,
   `districtName` VARCHAR(45) NOT NULL,
+  `latitude` FLOAT NOT NULL,
+  `longitude` FLOAT NOT NULL,
   PRIMARY KEY (`districtName`));
 
 
 CREATE TABLE IF NOT EXISTS `VDC_or_Municipality` (
   `vmID` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(40) NOT NULL,
-  `latitude` FLOAT NOT NULL,
-  `longitude` FLOAT NOT NULL,
   `districtName` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`vmID`),
   INDEX `districtName_idx` (`districtName` ASC) VISIBLE,

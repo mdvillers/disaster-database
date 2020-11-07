@@ -16,7 +16,7 @@
 | DisasterType        | /disastertype | /insert (POST), /view (GET), /delete/:name (DELETE)                                       |
 | DataSource          | /datasource   | /insert (POST), /view (GET), /delete/:id (DELETE)                                         |
 | District            | /district     | /insert (POST), /view (GET), /delete/:name (DELETE)                                       |
-| VDC_or_Municipality | /vm           | /insert (POST), /view (GET), /delete/:id (DELETE)                                         |
+| VDC_or_Municipality | /vm           | /insert (POST), /view (GET), /district/:name (GET), /delete/:id (DELETE)                                         |
 
 ##### Examples
 
