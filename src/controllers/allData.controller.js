@@ -1,4 +1,5 @@
 const { db } = require("../connectdb");
+const CustomError = require("../error/CustomError");
 
 exports.allData = (req, res, next) => {
   let sql = `select * from Incident i 

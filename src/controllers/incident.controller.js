@@ -103,27 +103,36 @@ exports.updateIncidentById = (req, res, next) => {
     .then((result) => {
       console.log(result[0]);
       disasterTypeName = result[0][0].disasterTypeName;
-      let sql = `UPDATE Incident SET ? WHERE incidentID = ?`;
+
+      let sql =
+        Object.keys(incident).length > 0
+          ? `UPDATE Incident SET ? WHERE incidentID = ?`
+          : `SELECT * FROM DataSource LIMIT 1`;
 
       db.promise()
         .query(sql, [incident, id])
         .then((result) => {
           console.log(result[0]);
 
+          sql =
+            Object.keys(otherDetails).length > 0
+              ? `UPDATE ${disasterTypeName} SET ? WHERE ${disasterTypeName.toLowerCase()}ID = ?`
+              : `SELECT * FROM DataSource LIMIT 1`; //any valid query
+
           db.promise()
-            .query(
-              `UPDATE ${disasterTypeName} SET ? WHERE ${disasterTypeName.toLowerCase()}ID = ?`,
-              [otherDetails, id]
-            )
+            .query(sql, [otherDetails, id])
             .then((result) => {
-              console.log(result[0]);
-              res.json(result[0]);
+              res.json({ message: "updated" });
             })
             .catch((err) =>
-              next(new CustomError(`Cannot Update ${disasterTypeName}`, 400))
+              next(
+                new CustomError(`Cannot Update ${disasterTypeName}` + err, 400)
+              )
             );
         })
-        .catch((err) => next(new CustomError("Cannot Update Incident", 400)));
+        .catch((err) =>
+          next(new CustomError("Cannot Update Incident" + err, 400))
+        );
     })
     .catch((err) =>
       next(new CustomError("Cannot get disaster type name " + err, 400))
