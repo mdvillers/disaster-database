@@ -31,11 +31,11 @@ exports.getAllIncidents = (req, res, next) => {
   let sql;
   let { type } = req.params;
   if (type) type = type.toLowerCase();
-  if (!disasterTypes.includes(type && type.capitalize()))
-    sql = `SELECT * FROM Incident i ${joinsql}`;
-  else
+  if (!type) sql = `SELECT * FROM Incident i ${joinsql}`;
+  else if (disasterTypes.includes(type.capitalize()))
     sql = `SELECT * FROM ${type.capitalize()} x join Incident i on i.incidentID=x.${type}ID ${joinsql}`;
-
+  else
+    sql = `SELECT * FROM Incident i ${joinsql} WHERE i.disasterTypeName="${type.capitalize()}"`;
   db.promise()
     .query(sql)
     .then((result) => {
@@ -101,11 +101,12 @@ exports.updateIncidentById = (req, res, next) => {
       console.log(result[0]);
       disasterTypeName = result[0][0].disasterTypeName;
 
-      const otherDetails = getObjectWithKeysInArray(
-        eval(`${disasterTypeName}_KEYS`.toUpperCase()),
-        incidentDetails
-      );
-
+      const otherDetails = disasterTypes.includes(disasterTypeName)
+        ? getObjectWithKeysInArray(
+            eval(`${disasterTypeName}_KEYS`.toUpperCase()),
+            incidentDetails
+          )
+        : {};
       let sql =
         Object.keys(incident).length > 0
           ? `UPDATE Incident SET ? WHERE incidentID = ?`
