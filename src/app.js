@@ -1,5 +1,5 @@
 const express = require("express");
-const { errorMiddleware } = require("./middlewares/errorMiddleware");
+const { errorMiddleware } = require("./middlewares/error.middleware");
 require("./connectdb");
 const createRoutes = require("./routes/create.routes");
 const incidentRoutes = require("./routes/incident.routes");
@@ -8,6 +8,7 @@ const DataSourceRoutes = require("./routes/datasource.routes");
 const districtRoutes = require("./routes/district.routes");
 const vmRoutes = require("./routes/vm.routes");
 const { allData } = require("./controllers/allData.controller");
+const adminRoutes = require("./routes/admin.routes");
 
 const app = express();
 app.use(require("cors")());
@@ -25,6 +26,8 @@ app.use("/DataSource", DataSourceRoutes);
 app.use("/district", districtRoutes);
 //VDC_or_Municipality table
 app.use("/vm", vmRoutes);
+//VDC_or_Municipality table
+app.use("/admin", adminRoutes);
 
 app.get("/", allData);
 

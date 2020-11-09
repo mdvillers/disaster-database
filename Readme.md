@@ -10,17 +10,18 @@
 
 ### Tables in database
 
-| Table               | Main Point    | Attachable                                                                                |
-| ------------------- | ------------- | ----------------------------------------------------------------------------------------- |
-| Incident            | /incident     | /insert (POST), /view (GET), /view/:type (GET), /delete/:id (DELETE), /update/:id (PATCH) |
-| DisasterType        | /disastertype | /insert (POST), /view (GET), /delete/:name (DELETE)                                       |
-| DataSource          | /datasource   | /insert (POST), /view (GET), /delete/:id (DELETE)                                         |
-| District            | /district     | /insert (POST), /view (GET), /delete/:name (DELETE)                                       |
-| VDC_or_Municipality | /vm           | /insert (POST), /view (GET), /district/:name (GET), /delete/:id (DELETE)                                         |
+| Table               | Main Point    | Attachable                                                                                                                              |
+| ------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Incident            | /incident     | /view (GET) <br> /view/:type (GET) <br> `AUTHENTICATION REQUIRED` <br>/insert (POST) <br> /delete/:id (DELETE) <br> /update/:id (PATCH) |
+| DisasterType        | /disastertype | /view (GET) <br> `AUTHENTICATION REQUIRED` <br>/insert (POST) <br> /delete/:name (DELETE)                                               |
+| DataSource          | /datasource   | /view (GET) <br> `AUTHENTICATION REQUIRED` <br>/insert (POST) <br> /delete/:id (DELETE)                                                 |
+| District            | /district     | /view (GET) <br> `AUTHENTICATION REQUIRED` <br>/insert (POST) <br> /delete/:name (DELETE)                                               |
+| VDC_or_Municipality | /vm           | /view (GET) <br> `AUTHENTICATION REQUIRED` <br>/insert (POST) <br> /district/:name (GET) <br> /delete/:id (DELETE)                      |
 
 ##### Examples
 
 ```py
+
 https://localhost:5000/incident/view for viewing incident table
 https://localhost:5000/incident/insert for inserting into incident table
 ```
