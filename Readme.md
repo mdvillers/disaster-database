@@ -17,6 +17,8 @@
 | DataSource          | /datasource   | /view (GET) <br> `AUTHENTICATION REQUIRED` <br>/insert (POST) <br> /delete/:id (DELETE)                                                 |
 | District            | /district     | /view (GET) <br> `AUTHENTICATION REQUIRED` <br>/insert (POST) <br> /delete/:name (DELETE)                                               |
 | VDC_or_Municipality | /vm           | /view (GET) <br> `AUTHENTICATION REQUIRED` <br>/insert (POST) <br> /district/:name (GET) <br> /delete/:id (DELETE)                      |
+| Admin               | /admin        | /signin (POST) <br> `AUTHENTICATION REQUIRED`<br> /create (POST) <br> /getuser (GET)                                                    |
+
 
 ##### Examples
 
