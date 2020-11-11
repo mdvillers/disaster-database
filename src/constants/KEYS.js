@@ -10,6 +10,7 @@ exports.INCIDENT_KEYS = [
   `disasterTypeName`,
   `locationID`,
   `sourceID`,
+  `comment`,
 ];
 
 exports.FLOOD_KEYS = [`origin`, `height`, `cattleLoss`];
