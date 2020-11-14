@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   getAllIncidents,
+  getImagesForIncidentById,
   insertIncident,
   deleteIncidentById,
   updateIncidentById,
@@ -12,6 +13,7 @@ const router = express.Router();
 
 router.get("/view", getAllIncidents);
 router.get("/view/:type", getAllIncidents);
+router.get("/image/:id", getImagesForIncidentById);
 
 /*REQUIRES AUTHENTICATION*/
 router.use(verifyToken);

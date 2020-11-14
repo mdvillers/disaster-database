@@ -5,14 +5,14 @@ const {
   EARTHQUAKE_KEYS,
   FIRE_KEYS,
 } = require("../constants/KEYS");
+const fs = require("fs");
 const CustomError = require("../error/CustomError");
 
 let joinsql = `natural join DisasterType 
               natural join DataSource 
               join VDC_or_Municipality vm 
               on i.locationID = vm.vmID 
-              natural join District
-              natural join Image`;
+              natural join District`;
 
 const disasterTypes = ["Flood", "Earthquake", "Fire"];
 
@@ -45,6 +45,19 @@ exports.getAllIncidents = (req, res, next) => {
       res.json(result[0]);
     })
     .catch((err) => next(new CustomError("Cannot get Incident", 400)));
+};
+
+exports.getImagesForIncidentById = (req, res, next) => {
+  let { id } = req.params;
+  const imageSql = `SELECT path from Image where incidentID = ?`;
+
+  return db
+    .promise()
+    .query(imageSql, id)
+    .then((result) => res.json(result[0]))
+    .catch((err) =>
+      next(new CustomError("Cannot get images for incident" + id, 400))
+    );
 };
 
 exports.insertIncident = (req, res, next) => {
@@ -174,13 +187,26 @@ exports.updateIncidentById = (req, res, next) => {
 
 exports.deleteIncidentById = (req, res, next) => {
   const { id } = req.params;
-  let sql = `DELETE FROM Incident where incidentID = ?`;
+
+  const imageSql = `SELECT path from Image where incidentID = ?`;
   return db
     .promise()
-    .query(sql, id)
+    .query(imageSql, id)
     .then((result) => {
-      console.log(result[0]);
-      res.json(result[0]);
+      images = result[0];
+      images.forEach((image) => {
+        fs.unlinkSync(image.path);
+      });
+      let sql = `DELETE FROM Incident where incidentID = ?`;
+      return db
+        .promise()
+        .query(sql, id)
+        .then((result) => {
+          return res.json({ message: "deleted successfully" });
+        })
+        .catch((err) =>
+          next(new CustomError("Cannot delete images for incident" + id, 400))
+        );
     })
     .catch((err) => next(new CustomError("Cannot delete Incident", 400)));
 };
