@@ -13,7 +13,8 @@ exports.allData = (req, res, next) => {
           left join Flood f 
           on i.incidentID = f.floodID 
           left join Fire fi 
-          on i.incidentID = fi.fireID`;
+          on i.incidentID = fi.fireID
+          `;
   db.promise()
     .query(sql)
     .then((result) => {

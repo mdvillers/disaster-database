@@ -34,7 +34,20 @@ CREATE TABLE IF NOT EXISTS `VDC_or_Municipality` (
   INDEX `districtName_idx` (`districtName` ASC) VISIBLE,
   CONSTRAINT `districtName`
     FOREIGN KEY (`districtName`)
-    REFERENCES `District` (`districtName`));
+    REFERENCES `District` (`districtName`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+CREATE TABLE IF NOT EXISTS `Image` (
+  `imageID` INT NOT NULL AUTO_INCREMENT,
+  `incidentID` INT NOT NULL,
+  `path` VARCHAR(200) NOT NULL,
+  PRIMARY KEY (`imageID`),
+  CONSTRAINT `incidentID`
+    FOREIGN KEY (`incidentID`)
+    REFERENCES `Incident` (`incidentID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
 
 
 CREATE TABLE IF NOT EXISTS `Incident` (
@@ -61,10 +74,14 @@ CREATE TABLE IF NOT EXISTS `Incident` (
     ON UPDATE CASCADE,
   CONSTRAINT `locationID`
     FOREIGN KEY (`locationID`)
-    REFERENCES `VDC_or_Municipality` (`vmID`),
+    REFERENCES `VDC_or_Municipality` (`vmID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT `sourceID`
     FOREIGN KEY (`sourceID`)
-    REFERENCES `DataSource` (`sourceID`));
+    REFERENCES `DataSource` (`sourceID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
 
 
 CREATE TABLE IF NOT EXISTS `Earthquake` (

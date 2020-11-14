@@ -11,7 +11,8 @@ let joinsql = `natural join DisasterType
               natural join DataSource 
               join VDC_or_Municipality vm 
               on i.locationID = vm.vmID 
-              natural join District`;
+              natural join District
+              natural join Image`;
 
 const disasterTypes = ["Flood", "Earthquake", "Fire"];
 
@@ -36,7 +37,8 @@ exports.getAllIncidents = (req, res, next) => {
     sql = `SELECT * FROM ${type.capitalize()} x join Incident i on i.incidentID=x.${type}ID ${joinsql}`;
   else
     sql = `SELECT * FROM Incident i ${joinsql} WHERE i.disasterTypeName="${type.capitalize()}"`;
-  db.promise()
+  return db
+    .promise()
     .query(sql)
     .then((result) => {
       console.log(result[0]);
@@ -54,8 +56,10 @@ exports.insertIncident = (req, res, next) => {
 
   const { disasterTypeName } = incident;
 
+  console.log(req.files);
   //insert into incident table first
-  db.promise()
+  return db
+    .promise()
     .query(incidentSql, incident)
     .then((result) => {
       let incidentID, otherSql;
@@ -66,6 +70,17 @@ exports.insertIncident = (req, res, next) => {
         incidentDetails
       );
 
+      //upload images if any
+      if (req.files.length > 0) {
+        let imageSql = `INSERT INTO Image SET ?`;
+        req.files.forEach((file) => {
+          db.promise()
+            .query(imageSql, { incidentID, path: file.path })
+            .then((result) => console.log(result))
+            .catch((err) => next(new CustomError("Cannot upload image")));
+        });
+      }
+
       //make suitable sql commands to enter into respective disasterType
       if (disasterTypes.includes(disasterTypeName)) {
         otherDetails[`${disasterTypeName.toLowerCase()}ID`] = incidentID;
@@ -75,16 +90,16 @@ exports.insertIncident = (req, res, next) => {
       }
 
       //Insert into respective disasterType
-      db.promise()
+      return db
+        .promise()
         .query(otherSql, otherDetails)
         .then((result) => {
           console.log(result[0]);
+          res.json({ message: "Incident created successfully" });
         })
         .catch((err) => next(new CustomError("Cannot get Incident", 400)));
     })
-    .catch((err) => next(new CustomError("Cannot insert incident", 400)));
-
-  res.json({ message: "Incident created successfully" });
+    .catch((err) => next(new CustomError("Cannot insert incident" + err, 400)));
 };
 
 exports.updateIncidentById = (req, res, next) => {
@@ -95,7 +110,8 @@ exports.updateIncidentById = (req, res, next) => {
 
   const incident = getObjectWithKeysInArray(INCIDENT_KEYS, incidentDetails);
 
-  db.promise()
+  return db
+    .promise()
     .query(`SELECT disasterTypeName FROM Incident WHERE incidentID = ? `, id)
     .then((result) => {
       console.log(result[0]);
@@ -107,12 +123,25 @@ exports.updateIncidentById = (req, res, next) => {
             incidentDetails
           )
         : {};
+
+      //upload images if any
+      if (req.files.length > 0) {
+        let imageSql = `INSERT INTO Image SET ?`;
+        req.files.forEach((file) => {
+          db.promise()
+            .query(imageSql, { incidentID: id, path: file.path })
+            .then((result) => console.log(result))
+            .catch((err) => next(new CustomError("Cannot upload image")));
+        });
+      }
+
       let sql =
         Object.keys(incident).length > 0
           ? `UPDATE Incident SET ? WHERE incidentID = ?`
           : `SELECT * FROM DataSource LIMIT 1`;
 
-      db.promise()
+      return db
+        .promise()
         .query(sql, [incident, id])
         .then((result) => {
           console.log(result[0]);
@@ -122,7 +151,8 @@ exports.updateIncidentById = (req, res, next) => {
               ? `UPDATE ${disasterTypeName} SET ? WHERE ${disasterTypeName.toLowerCase()}ID = ?`
               : `SELECT * FROM DataSource LIMIT 1`; //any valid query
 
-          db.promise()
+          return db
+            .promise()
             .query(sql, [otherDetails, id])
             .then((result) => {
               res.json({ message: "updated" });
@@ -145,7 +175,8 @@ exports.updateIncidentById = (req, res, next) => {
 exports.deleteIncidentById = (req, res, next) => {
   const { id } = req.params;
   let sql = `DELETE FROM Incident where incidentID = ?`;
-  db.promise()
+  return db
+    .promise()
     .query(sql, id)
     .then((result) => {
       console.log(result[0]);
