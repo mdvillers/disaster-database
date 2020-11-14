@@ -19,7 +19,6 @@ exports.createDatabase = (req, res, next) => {
     if (err) {
       return next(CustomError(err.message, 500));
     }
-    console.log(result);
   });
   res.json({ message: "created disaster database successfully" });
 };
@@ -35,7 +34,6 @@ exports.createTables = (req, res, next) => {
             console.log(err);
           });
         }
-        console.log(result);
       });
     });
     res.send({ message: "tables created successfully" });

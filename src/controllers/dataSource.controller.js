@@ -6,7 +6,6 @@ exports.getAllDataSources = (req, res, next) => {
   db.promise()
     .query(sql)
     .then((result) => {
-      console.log(result[0]);
       res.json(result[0]);
     })
     .catch((err) => next(new CustomError("Cannot get DataSource", 400)));
@@ -19,7 +18,6 @@ exports.insertDataSource = (req, res, next) => {
   db.promise()
     .query(sql, dataSource)
     .then((result) => {
-      console.log(result[0]);
       res.json(result[0]);
     })
     .catch((err) => next(new CustomError("Cannot insert into table", 400)));

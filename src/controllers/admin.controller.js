@@ -29,7 +29,7 @@ exports.signin = (req, res, next) => {
 
       return res.json({ token });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => next(new CustomError(`Couldn't signin`, 400)));
 };
 
 exports.createAdmin = async (req, res, next) => {
@@ -40,7 +40,9 @@ exports.createAdmin = async (req, res, next) => {
     .query(sql, username)
     .then((result) => {
       if (result[0].length > 0) {
-        return next(new CustomError(`Username: ${username} already exists!`));
+        return next(
+          new CustomError(`Username: ${username} already exists!`, 400)
+        );
       }
 
       password = bcrypt.hashSync(password, 8);
@@ -50,9 +52,9 @@ exports.createAdmin = async (req, res, next) => {
         .promise()
         .query(sql, { username, password })
         .then((result) => res.json({ message: "created admin" }))
-        .catch((err) => console.log(err));
+        .catch(next(new CustomError(`Couldn't create Admin`, 400)));
     })
-    .catch((err) => console.log(err));
+    .catch((err) => next(new CustomError(`couldn't find username!`, 400)));
 };
 
 exports.getUser = async (req, res, next) => {
@@ -69,5 +71,5 @@ exports.getUser = async (req, res, next) => {
 
       return res.json({ username });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => next(new CustomError(`cannot get user`, 400)));
 };

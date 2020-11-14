@@ -6,7 +6,6 @@ exports.getAllDisasterTypes = (req, res, next) => {
   db.promise()
     .query(sql)
     .then((result) => {
-      console.log(result[0]);
       res.json(result[0]);
     })
     .catch((err) => next(new CustomError("Cannot get DisasterType", 400)));
@@ -18,7 +17,6 @@ exports.insertDisasterType = (req, res, next) => {
   db.promise()
     .query(sql, disasterType)
     .then((result) => {
-      console.log(result[0]);
       res.json(result[0]);
     })
     .catch((err) =>

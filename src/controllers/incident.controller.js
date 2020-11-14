@@ -41,7 +41,6 @@ exports.getAllIncidents = (req, res, next) => {
     .promise()
     .query(sql)
     .then((result) => {
-      console.log(result[0]);
       res.json(result[0]);
     })
     .catch((err) => next(new CustomError("Cannot get Incident", 400)));
@@ -69,7 +68,6 @@ exports.insertIncident = (req, res, next) => {
 
   const { disasterTypeName } = incident;
 
-  console.log(req.files);
   //insert into incident table first
   return db
     .promise()
@@ -89,7 +87,6 @@ exports.insertIncident = (req, res, next) => {
         req.files.forEach((file) => {
           db.promise()
             .query(imageSql, { incidentID, path: file.path })
-            .then((result) => console.log(result))
             .catch((err) => next(new CustomError("Cannot upload image")));
         });
       }
@@ -107,7 +104,6 @@ exports.insertIncident = (req, res, next) => {
         .promise()
         .query(otherSql, otherDetails)
         .then((result) => {
-          console.log(result[0]);
           res.json({ message: "Incident created successfully" });
         })
         .catch((err) => next(new CustomError("Cannot get Incident", 400)));
@@ -127,7 +123,6 @@ exports.updateIncidentById = (req, res, next) => {
     .promise()
     .query(`SELECT disasterTypeName FROM Incident WHERE incidentID = ? `, id)
     .then((result) => {
-      console.log(result[0]);
       disasterTypeName = result[0][0].disasterTypeName;
 
       const otherDetails = disasterTypes.includes(disasterTypeName)
@@ -143,7 +138,6 @@ exports.updateIncidentById = (req, res, next) => {
         req.files.forEach((file) => {
           db.promise()
             .query(imageSql, { incidentID: id, path: file.path })
-            .then((result) => console.log(result))
             .catch((err) => next(new CustomError("Cannot upload image")));
         });
       }
@@ -157,8 +151,6 @@ exports.updateIncidentById = (req, res, next) => {
         .promise()
         .query(sql, [incident, id])
         .then((result) => {
-          console.log(result[0]);
-
           sql =
             Object.keys(otherDetails).length > 0
               ? `UPDATE ${disasterTypeName} SET ? WHERE ${disasterTypeName.toLowerCase()}ID = ?`
