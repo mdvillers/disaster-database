@@ -118,6 +118,10 @@ exports.updateIncidentById = (req, res, next) => {
   } = req;
 
   const incident = getObjectWithKeysInArray(INCIDENT_KEYS, incidentDetails);
+  let { imagesToDelete } = incidentDetails;
+
+  if (imagesToDelete && !Array.isArray(imagesToDelete))
+    imagesToDelete = [imagesToDelete];
 
   return db
     .promise()
@@ -160,7 +164,17 @@ exports.updateIncidentById = (req, res, next) => {
             .promise()
             .query(sql, [otherDetails, id])
             .then((result) => {
-              res.json({ message: "updated" });
+              sql = `DELETE FROM Image where path = ?`;
+              if (imagesToDelete)
+                imagesToDelete.forEach((imageToDelete) => {
+                  db.promise()
+                    .query(sql, imageToDelete)
+                    .catch((err) =>
+                      next(new CustomError(`Cannot delete images` + err, 400))
+                    );
+                  fs.unlinkSync(imageToDelete);
+                });
+              return res.json({ message: "updated" });
             })
             .catch((err) =>
               next(
@@ -193,7 +207,7 @@ exports.deleteIncidentById = (req, res, next) => {
       return db
         .promise()
         .query(sql, id)
-        .then((result) => {
+        .then(() => {
           return res.json({ message: "deleted successfully" });
         })
         .catch((err) =>
