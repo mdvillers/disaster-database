@@ -8,11 +8,11 @@ const {
 const fs = require("fs");
 const CustomError = require("../error/CustomError");
 
-let joinsql = `natural join DisasterType 
-              natural join DataSource 
-              join VDC_or_Municipality vm 
+let joinsql = `natural join disastertypes 
+              natural join datasources 
+              join vms vm 
               on i.locationID = vm.vmID 
-              natural join District`;
+              natural join districts`;
 
 const disasterTypes = ["Flood", "Earthquake", "Fire"];
 
@@ -32,23 +32,23 @@ exports.getAllIncidents = (req, res, next) => {
   let sql;
   let { type } = req.params;
   if (type) type = type.toLowerCase();
-  if (!type) sql = `SELECT * FROM Incident i ${joinsql}`;
+  if (!type) sql = `SELECT * FROM incidents i ${joinsql}`;
   else if (disasterTypes.includes(type.capitalize()))
-    sql = `SELECT * FROM ${type.capitalize()} x join Incident i on i.incidentID=x.${type}ID ${joinsql}`;
+    sql = `SELECT * FROM ${type}s x join incidents i on i.incidentID=x.${type}ID ${joinsql}`;
   else
-    sql = `SELECT * FROM Incident i ${joinsql} WHERE i.disasterTypeName="${type.capitalize()}"`;
+    sql = `SELECT * FROM incidents i ${joinsql} WHERE i.disasterTypeName="${type.capitalize()}"`;
   return db
     .promise()
     .query(sql)
     .then((result) => {
       res.json(result[0]);
     })
-    .catch((err) => next(new CustomError("Cannot get Incident", 400)));
+    .catch((err) => next(new CustomError("Cannot get incidents", 400)));
 };
 
 exports.getImagesForIncidentById = (req, res, next) => {
   let { id } = req.params;
-  const imageSql = `SELECT path from Image where incidentID = ?`;
+  const imageSql = `SELECT path from images where incidentID = ?`;
 
   return db
     .promise()
@@ -64,7 +64,7 @@ exports.insertIncident = (req, res, next) => {
 
   const incident = getObjectWithKeysInArray(INCIDENT_KEYS, incidentDetails);
 
-  let incidentSql = `INSERT INTO Incident SET ?`;
+  let incidentSql = `INSERT INTO incidents SET ?`;
 
   const { disasterTypeName } = incident;
 
@@ -83,7 +83,7 @@ exports.insertIncident = (req, res, next) => {
 
       //upload images if any
       if (req.files.length > 0) {
-        let imageSql = `INSERT INTO Image SET ?`;
+        let imageSql = `INSERT INTO images SET ?`;
         req.files.forEach((file) => {
           db.promise()
             .query(imageSql, { incidentID, path: file.path })
@@ -94,7 +94,7 @@ exports.insertIncident = (req, res, next) => {
       //make suitable sql commands to enter into respective disasterType
       if (disasterTypes.includes(disasterTypeName)) {
         otherDetails[`${disasterTypeName.toLowerCase()}ID`] = incidentID;
-        otherSql = `INSERT INTO ${disasterTypeName} SET ?`;
+        otherSql = `INSERT INTO ${disasterTypeName.toLowerCase()}s SET ?`;
       } else {
         return next(new CustomError("Invalid disaster typename", 404));
       }
@@ -104,9 +104,9 @@ exports.insertIncident = (req, res, next) => {
         .promise()
         .query(otherSql, otherDetails)
         .then((result) => {
-          res.json({ message: "Incident created successfully" });
+          res.json({ message: "incidents created successfully" });
         })
-        .catch((err) => next(new CustomError("Cannot get Incident", 400)));
+        .catch((err) => next(new CustomError("Cannot get incidents", 400)));
     })
     .catch((err) => next(new CustomError("Cannot insert incident" + err, 400)));
 };
@@ -125,7 +125,7 @@ exports.updateIncidentById = (req, res, next) => {
 
   return db
     .promise()
-    .query(`SELECT disasterTypeName FROM Incident WHERE incidentID = ? `, id)
+    .query(`SELECT disasterTypeName FROM incidents WHERE incidentID = ? `, id)
     .then((result) => {
       disasterTypeName = result[0][0].disasterTypeName;
 
@@ -138,7 +138,7 @@ exports.updateIncidentById = (req, res, next) => {
 
       //upload images if any
       if (req.files.length > 0) {
-        let imageSql = `INSERT INTO Image SET ?`;
+        let imageSql = `INSERT INTO images SET ?`;
         req.files.forEach((file) => {
           db.promise()
             .query(imageSql, { incidentID: id, path: file.path })
@@ -148,8 +148,8 @@ exports.updateIncidentById = (req, res, next) => {
 
       let sql =
         Object.keys(incident).length > 0
-          ? `UPDATE Incident SET ? WHERE incidentID = ?`
-          : `SELECT * FROM DataSource LIMIT 1`;
+          ? `UPDATE incidents SET ? WHERE incidentID = ?`
+          : `SELECT * FROM datasources LIMIT 1`;
 
       return db
         .promise()
@@ -157,14 +157,14 @@ exports.updateIncidentById = (req, res, next) => {
         .then((result) => {
           sql =
             Object.keys(otherDetails).length > 0
-              ? `UPDATE ${disasterTypeName} SET ? WHERE ${disasterTypeName.toLowerCase()}ID = ?`
-              : `SELECT * FROM DataSource LIMIT 1`; //any valid query
+              ? `UPDATE ${disasterTypeName.toLowerCase()}s SET ? WHERE ${disasterTypeName.toLowerCase()}ID = ?`
+              : `SELECT * FROM datasources LIMIT 1`; //any valid query
 
           return db
             .promise()
             .query(sql, [otherDetails, id])
             .then((result) => {
-              sql = `DELETE FROM Image where path = ?`;
+              sql = `DELETE FROM images where path = ?`;
               if (imagesToDelete)
                 imagesToDelete.forEach((imageToDelete) => {
                   db.promise()
@@ -178,12 +178,15 @@ exports.updateIncidentById = (req, res, next) => {
             })
             .catch((err) =>
               next(
-                new CustomError(`Cannot Update ${disasterTypeName}` + err, 400)
+                new CustomError(
+                  `Cannot Update ${disasterTypeName.toLowerCase()}s` + err,
+                  400
+                )
               )
             );
         })
         .catch((err) =>
-          next(new CustomError("Cannot Update Incident" + err, 400))
+          next(new CustomError("Cannot Update incidents" + err, 400))
         );
     })
     .catch((err) =>
@@ -194,7 +197,7 @@ exports.updateIncidentById = (req, res, next) => {
 exports.deleteIncidentById = (req, res, next) => {
   const { id } = req.params;
 
-  const imageSql = `SELECT path from Image where incidentID = ?`;
+  const imageSql = `SELECT path from images where incidentID = ?`;
   return db
     .promise()
     .query(imageSql, id)
@@ -203,7 +206,7 @@ exports.deleteIncidentById = (req, res, next) => {
       images.forEach((image) => {
         fs.unlinkSync(image.path);
       });
-      let sql = `DELETE FROM Incident where incidentID = ?`;
+      let sql = `DELETE FROM incidents where incidentID = ?`;
       return db
         .promise()
         .query(sql, id)
@@ -214,5 +217,5 @@ exports.deleteIncidentById = (req, res, next) => {
           next(new CustomError("Cannot delete images for incident" + id, 400))
         );
     })
-    .catch((err) => next(new CustomError("Cannot delete Incident", 400)));
+    .catch((err) => next(new CustomError("Cannot delete incidents", 400)));
 };

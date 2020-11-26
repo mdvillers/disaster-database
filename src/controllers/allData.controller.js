@@ -2,17 +2,17 @@ const { db } = require("../connectdb");
 const CustomError = require("../error/CustomError");
 
 exports.allData = (req, res, next) => {
-  let sql = `select * from Incident i 
-          natural join DisasterType 
-          natural join DataSource 
-          join VDC_or_Municipality vm 
+  let sql = `select * from incidents i 
+          natural join disastertypes 
+          natural join datasources 
+          join vms vm 
           on i.locationID = vm.vmID 
-          natural join District 
-          left join Earthquake e 
+          natural join districts 
+          left join earthquakes e 
           on i.incidentID = e.earthquakeID 
-          left join Flood f 
+          left join floods f 
           on i.incidentID = f.floodID 
-          left join Fire fi 
+          left join fires fi 
           on i.incidentID = fi.fireID
           `;
   db.promise()

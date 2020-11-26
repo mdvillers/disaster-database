@@ -25,12 +25,12 @@ app.use("/incident", incidentRoutes);
 //disasterType table
 app.use("/disasterType", disasterTypeRoutes);
 //DataSource table
-app.use("/DataSource", DataSourceRoutes);
+app.use("/datasource", DataSourceRoutes);
 //district table
 app.use("/district", districtRoutes);
-//VDC_or_Municipality table
+//vms table
 app.use("/vm", vmRoutes);
-//VDC_or_Municipality table
+//admin routes
 app.use("/admin", adminRoutes);
 
 app.get("/", allData);

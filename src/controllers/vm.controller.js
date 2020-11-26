@@ -2,7 +2,7 @@ const { db } = require("../connectdb");
 const CustomError = require("../error/CustomError");
 
 exports.getAllvms = (req, res, next) => {
-  let sql = `SELECT * FROM VDC_or_Municipality`;
+  let sql = `SELECT * FROM vms`;
   db.promise()
     .query(sql)
     .then((result) => {
@@ -13,7 +13,7 @@ exports.getAllvms = (req, res, next) => {
 
 exports.getVmsByDistrictName = (req, res, next) => {
   const { name } = req.params;
-  let sql = `SELECT * FROM VDC_or_Municipality where districtName = ?`;
+  let sql = `SELECT * FROM vms where districtName = ?`;
   db.promise()
     .query(sql, name)
     .then((result) => {
@@ -24,7 +24,7 @@ exports.getVmsByDistrictName = (req, res, next) => {
 
 exports.insertvm = (req, res, next) => {
   const vm = req.body;
-  let sql = `INSERT INTO VDC_or_Municipality SET ?`;
+  let sql = `INSERT INTO vms SET ?`;
   db.promise()
     .query(sql, vm)
     .then((result) => {
@@ -35,7 +35,7 @@ exports.insertvm = (req, res, next) => {
 
 exports.deletevmById = (req, res, next) => {
   const { id } = req.params;
-  let sql = `DELETE FROM VDC_or_Municipality where vmID = ?`;
+  let sql = `DELETE FROM vms where vmID = ?`;
   db.promise()
     .query(sql, id)
     .then((result) => {

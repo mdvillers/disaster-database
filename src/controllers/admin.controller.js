@@ -7,7 +7,7 @@ const { JWT_KEY } = process.env;
 
 exports.signin = (req, res, next) => {
   const { username, password } = req.body;
-  let sql = `SELECT * FROM Admin WHERE username=?`;
+  let sql = `SELECT * FROM admins WHERE username=?`;
   return db
     .promise()
     .query(sql, username)
@@ -34,7 +34,7 @@ exports.signin = (req, res, next) => {
 
 exports.createAdmin = async (req, res, next) => {
   let { username, password } = req.body;
-  let sql = `SELECT * FROM Admin WHERE username=?`;
+  let sql = `SELECT * FROM admins WHERE username=?`;
   return db
     .promise()
     .query(sql, username)
@@ -47,19 +47,19 @@ exports.createAdmin = async (req, res, next) => {
 
       password = bcrypt.hashSync(password, 8);
 
-      sql = `INSERT INTO Admin SET ?`;
+      sql = `INSERT INTO admins SET ?`;
       return db
         .promise()
         .query(sql, { username, password })
         .then((result) => res.json({ message: "created admin" }))
-        .catch(next(new CustomError(`Couldn't create Admin`, 400)));
+        .catch(next(new CustomError(`Couldn't create admins`, 400)));
     })
     .catch((err) => next(new CustomError(`couldn't find username!`, 400)));
 };
 
 exports.getUser = async (req, res, next) => {
   const { userID } = req;
-  let sql = `SELECT * FROM Admin WHERE userID=?`;
+  let sql = `SELECT * FROM admins WHERE userID=?`;
   return db
     .promise()
     .query(sql, userID)
